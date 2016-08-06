@@ -1,0 +1,7 @@
+com/youzan/test/faker/api/service/AbstractHttpCallbackRequest.class
+com/youzan/test/faker/api/service/AbstractHttpRedirectRequest.class
+com/youzan/test/faker/api/codec/ExpectationCodec.class
+com/youzan/test/faker/api/dto/ExpectationDto.class
+com/youzan/test/faker/api/exception/FakerResponseException.class
+com/youzan/test/faker/api/exception/FakerOperationException.class
+com/youzan/test/faker/api/service/AbstractBaseHttpRequest.class

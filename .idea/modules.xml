@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/faker.iml" filepath="$PROJECT_DIR$/faker.iml" />
+      <module fileurl="file://$PROJECT_DIR$/faker-api/faker-api.iml" filepath="$PROJECT_DIR$/faker-api/faker-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/faker-client/faker-client.iml" filepath="$PROJECT_DIR$/faker-client/faker-client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/faker-core/faker-core.iml" filepath="$PROJECT_DIR$/faker-core/faker-core.iml" />
+    </modules>
+  </component>
+</project>

@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="faker-core:war">
+    <output-path>$PROJECT_DIR$/faker-core/target</output-path>
+    <root id="archive" name="faker-core.war">
+      <element id="artifact" artifact-name="faker-core:war exploded" />
+    </root>
+  </artifact>
+</component>
