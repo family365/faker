@@ -12,6 +12,7 @@ import com.youzan.test.faker.util.HttpRequestUtil;
 import com.youzan.test.faker.util.ReflectiveUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -27,6 +28,7 @@ import java.util.Map;
  * Created by libaixian on 16/8/1.
  */
 @Slf4j
+@Component
 public class HardCodeProcessor {
     @Resource
     private ExpectationCenterService expectationCenterService;

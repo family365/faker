@@ -6,6 +6,7 @@ import com.youzan.test.faker.dao.ExpectationRuleDao;
 import com.youzan.test.faker.dto.ExpectationRuleDto;
 import com.youzan.test.faker.matcher.ExpectationMatcher;
 import com.youzan.test.faker.po.ExpectationRulePO;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.Map;
 /**
  * Created by libaixian on 16/8/3.
  */
+@Service
 public class RegularExpectationService {
     @Resource
     private ExpectationRuleCache cache;

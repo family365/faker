@@ -1,16 +1,20 @@
 package com.youzan.test.faker.dao;
 
 import com.youzan.test.faker.po.ServiceConfigPO;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 /**
  * Created by libaixian on 16/8/3.
  */
-public interface ServiceConfigDao {
-    List<ServiceConfigPO> getAll();
+@Component
+public class ServiceConfigDao {
+    public List<ServiceConfigPO> getAll() {
+        return null;
+    }
 
-    void add(ServiceConfigPO serviceConfigPO);
+    public void add(ServiceConfigPO serviceConfigPO) {}
 
-    void delete(String key);
+    public void delete(String key) {}
 }

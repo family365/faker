@@ -3,6 +3,7 @@ package com.youzan.test.faker.facade;
 import com.youzan.test.faker.confLoader.ServiceRouterLoader;
 import com.youzan.test.faker.handler.Handler;
 import com.youzan.test.faker.handler.HandlerFactory;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.annotation.Resource;
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Created by libaixian on 16/7/31.
  */
+@Controller
 public class FakerRequestController {
     @Resource
     private ServiceRouterLoader serviceRouterLoader;

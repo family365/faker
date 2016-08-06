@@ -6,6 +6,7 @@ import com.youzan.test.faker.enums.MockTypeEnum;
 import com.youzan.test.faker.handler.Handler;
 import com.youzan.test.faker.processor.GeneralizedProcessor;
 import com.youzan.test.faker.processor.HardCodeProcessor;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +17,7 @@ import java.util.Set;
 /**
  * Created by libaixian on 16/7/31.
  */
+@Component
 public class ExternalHandlerImpl implements Handler{
     @Resource
     private ServiceConfigCache serviceConfigCache;

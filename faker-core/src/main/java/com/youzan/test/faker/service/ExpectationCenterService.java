@@ -5,6 +5,7 @@ import com.youzan.test.faker.api.exception.FakerResponseException;
 import com.youzan.test.faker.dto.ServiceConfigDto;
 import com.youzan.test.faker.messageConvert.MessageConverter;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Map;
@@ -12,6 +13,7 @@ import java.util.Map;
 /**
  * Created by libaixian on 16/8/5.
  */
+@Service
 public class ExpectationCenterService {
     @Resource
     private InjectedExpectationService injectedExpectationService;

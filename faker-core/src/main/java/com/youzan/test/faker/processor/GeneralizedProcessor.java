@@ -7,6 +7,7 @@ import com.youzan.test.faker.service.FootprintService;
 import com.youzan.test.faker.task.CallbackTask;
 import com.youzan.test.faker.util.HttpRequestUtil;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +19,7 @@ import java.util.Map;
 /**
  * Created by libaixian on 16/8/1.
  */
+@Component
 public class GeneralizedProcessor {
     @Resource
     private ExpectationCenterService expectationCenterService;

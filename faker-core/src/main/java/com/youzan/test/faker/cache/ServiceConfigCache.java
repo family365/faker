@@ -1,6 +1,7 @@
 package com.youzan.test.faker.cache;
 
 import com.youzan.test.faker.dto.ServiceConfigDto;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Set;
@@ -8,6 +9,7 @@ import java.util.Set;
 /**
  * Created by libaixian on 16/8/3.
  */
+@Component
 public class ServiceConfigCache {
     private LocalCache<ServiceConfigDto> cache = new LocalCache<>();
 

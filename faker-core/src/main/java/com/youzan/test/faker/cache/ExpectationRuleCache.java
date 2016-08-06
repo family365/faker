@@ -1,12 +1,14 @@
 package com.youzan.test.faker.cache;
 
 import com.youzan.test.faker.matcher.ExpectationMatcher;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 /**
  * Created by libaixian on 16/8/2.
  */
+@Component
 public class ExpectationRuleCache {
     private LocalCache<List<ExpectationMatcher>> cache = new LocalCache<>();
 

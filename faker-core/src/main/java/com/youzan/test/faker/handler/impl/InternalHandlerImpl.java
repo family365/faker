@@ -3,6 +3,7 @@ package com.youzan.test.faker.handler.impl;
 import com.youzan.test.faker.confLoader.ServiceRouterLoader;
 import com.youzan.test.faker.handler.Handler;
 import com.youzan.test.faker.processor.HardCodeProcessor;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -12,6 +13,7 @@ import java.util.Map;
 /**
  * Created by libaixian on 16/7/31.
  */
+@Component
 public class InternalHandlerImpl implements Handler {
     @Resource
     public ServiceRouterLoader serviceRouterLoader;
