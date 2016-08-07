@@ -31,7 +31,7 @@ public class GeneralizedProcessor {
     private CallbackTask callbackTask;
 
     public void process(HttpServletRequest request, HttpServletResponse response) {
-        String url = request.getRequestURI();
+        String url = request.getServletPath();
         Map<String, Object> request2Map = HttpRequestUtil.convertToMap(request);
 
         ExpectationDto expectationDto = expectationCenterService.process(url, request2Map);

@@ -20,7 +20,7 @@ import java.util.Map;
 @Component
 public class ServiceRouterLoader {
     public final Logger logger = LoggerFactory.getLogger(ServiceRouterLoader.class);
-    public final String ServiceRouterFile = "serviceRouter.xml";
+    public final String ServiceRouterFile = "conf/serviceRouter.xml";
 
     private Map<String, String> services = null;
 

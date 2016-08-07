@@ -51,7 +51,7 @@ public abstract class AbstractBaseHttpRequest {
     }
 
     public String getExpectationKey() {
-        return httpServletRequest.getRequestURI();
+        return httpServletRequest.getServletPath();
     }
 
     public abstract String getResponse(ExpectationDto expectation);

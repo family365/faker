@@ -73,7 +73,7 @@ public class HardCodeProcessor {
             ExpectationDto expectationDto = expectationCenterService.process(expectationKey, requestMap);
 
             if (AbstractHttpRedirectRequest.class.isAssignableFrom(classObj)) {
-                baseRequestProcessor(classObj, instance, request, response, expectationDto);
+                redirectRequestProcessor(classObj, instance, response, expectationDto);
                 return;
             }
 
@@ -82,13 +82,13 @@ public class HardCodeProcessor {
                 return;
             }
 
-            if (AbstractHttpRedirectRequest.class.isAssignableFrom(classObj)) {
-                redirectRequestProcessor(classObj, instance, response, expectationDto);
+            if (AbstractBaseHttpRequest.class.isAssignableFrom(classObj)) {
+                baseRequestProcessor(classObj, instance, request, response, expectationDto);
                 return;
             }
 
         } catch (Exception e) {
-
+            System.out.println(e.getMessage());
         }
     }
 
@@ -102,7 +102,7 @@ public class HardCodeProcessor {
 
     private void baseRequestProcessor(Class<?> type, Object instance, HttpServletRequest request,
                                       HttpServletResponse response, ExpectationDto expectationDto) throws Exception {
-        if (expectationDto.isHandOver2RealMethod()) {
+        if (expectationDto != null && expectationDto.isHandOver2RealMethod()) {
             Method realMethod = type.getMethod(CallRealMethod);
             realMethod.invoke(instance);
             return;
@@ -126,7 +126,7 @@ public class HardCodeProcessor {
 
     private void redirectRequestProcessor(Class<?> type, Object instance, HttpServletResponse response,
                                          ExpectationDto expectationDto) throws Exception {
-        if (expectationDto.isHandOver2RealMethod()) {
+        if (expectationDto != null && expectationDto.isHandOver2RealMethod()) {
             Method realMethod = type.getMethod(CallRealMethod);
             realMethod.invoke(instance);
             return;
@@ -134,8 +134,13 @@ public class HardCodeProcessor {
 
         callback(type, instance, expectationDto);
 
+        String redirectURL = null;
+        if (expectationDto != null && !StringUtils.isEmpty(expectationDto.getBgCallbackURL())) {
+            redirectURL = expectationDto.getBgCallbackURL();
+        }
+
         Method redirectURLGetter = type.getMethod(GetRedirectURL);
-        String redirectURL = (String) redirectURLGetter.invoke(instance);
+        redirectURL = (String) redirectURLGetter.invoke(instance);
 
         String retMessage = getResponseData(type, instance, expectationDto);
         if (!redirectURL.endsWith("/")) {
@@ -149,7 +154,7 @@ public class HardCodeProcessor {
     private void response(Class<?> type, Object instance, HttpServletRequest request,
                           HttpServletResponse response, ExpectationDto expectationDto) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, IOException {
         String retMessage = getResponseData(type, instance, expectationDto);
-        if (expectationDto.isSaveFootprint()) {
+        if (expectationDto != null && expectationDto.isSaveFootprint()) {
             Map<String, Object> requestMap = HttpRequestUtil.convertToMap(request);
             String requestStr = JSON.toJSONString(requestMap);
             footprintService.saveFootprint(expectationDto.getRequestUrl(), requestStr, retMessage);
@@ -161,7 +166,7 @@ public class HardCodeProcessor {
 
     private void callback(Class<?> type, Object instance, ExpectationDto expectationDto) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         String callBackURL;
-        if (!StringUtils.isEmpty(expectationDto.getBgCallbackURL())) {
+        if (expectationDto != null && !StringUtils.isEmpty(expectationDto.getBgCallbackURL())) {
             callBackURL = expectationDto.getBgCallbackURL();
         } else {
             Method callbackURLGetter = type.getMethod(GetCallbackUrl);
@@ -169,14 +174,19 @@ public class HardCodeProcessor {
         }
 
         String callbackData;
-        if (!StringUtils.isEmpty(expectationDto.getBgCallbackData())) {
+        if (expectationDto != null && !StringUtils.isEmpty(expectationDto.getBgCallbackData())) {
             callbackData = expectationDto.getBgCallbackData();
         } else {
             Method callbackDataGetter = type.getMethod(GetCallbackData);
             callbackData = (String) callbackDataGetter.invoke(instance);
         }
 
-        callbackTask.addCallbackTask(callBackURL, callbackData, expectationDto.getBgCallbackDelayTime());
+        int callbackDelayTime = 0;
+        if (expectationDto != null) {
+            callbackDelayTime = expectationDto.getBgCallbackDelayTime();
+        }
+
+        callbackTask.addCallbackTask(callBackURL, callbackData, callbackDelayTime);
     }
 
     private String getResponseData(Class<?> type, Object instance, ExpectationDto expectationDto) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {

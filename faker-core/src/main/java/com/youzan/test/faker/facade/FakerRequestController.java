@@ -21,12 +21,6 @@ public class FakerRequestController {
     @Resource
     private HandlerFactory handlerFactory;
 
-
-    @RequestMapping("/refund")
-    public void refund(HttpServletRequest request, HttpServletResponse response) {
-        doDispatch(request, response);
-    }
-
     @RequestMapping("/{path1}")
     public void path1(HttpServletRequest request, HttpServletResponse response) {
         doDispatch(request, response);

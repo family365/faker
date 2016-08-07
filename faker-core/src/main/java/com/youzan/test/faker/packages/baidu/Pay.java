@@ -15,10 +15,11 @@ import java.util.TreeMap;
  * Created by libaixian on 16/7/30.
  */
 public class Pay extends AbstractHttpRedirectRequest{
+    private static final String ReturnURL = "www.baidu.com"; //"http://trade.koudaitong.com/pay/baiduwap/return";
 
     @Override
     public String getRedirectURL() {
-        return "http://trade.koudaitong.com/pay/baiduwap/return";
+        return ReturnURL;
     }
 
     @Override

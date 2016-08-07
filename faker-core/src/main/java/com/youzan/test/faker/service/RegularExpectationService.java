@@ -33,6 +33,10 @@ public class RegularExpectationService {
             matcherList = cache.get(key);
         }
 
+        if (matcherList == null) {
+            return null;
+        }
+
         for(ExpectationMatcher matcher : matcherList) {
             if (matcher.matched(request)) {
                 return matcher.getExpectation();
@@ -45,6 +49,10 @@ public class RegularExpectationService {
     public void refresh(String key) {
         //TODO: 从数据库中抓取rule, 生成 ExpectationMatcher, 放入缓存
         List<ExpectationRulePO> ruleList = expectationRuleDao.getByKey(key);
+        if (ruleList == null || ruleList.isEmpty()) {
+            return;
+        }
+
         List<ExpectationMatcher> newMatcherList = new ArrayList<>();
         for(ExpectationRulePO expectationRulePO : ruleList) {
             ExpectationMatcher matcher = ExpectationMatcher.createInstance(key, expectationRulePO);

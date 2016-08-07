@@ -30,7 +30,7 @@ public class ExternalHandlerImpl implements Handler{
 
     @Override
     public boolean supports(HttpServletRequest request) {
-        String url = request.getRequestURI();
+        String url = request.getServletPath();
         Set<String> supportedAPI = serviceConfigCache.getKeys();
         if (!supportedAPI.contains(url)) {
             return false;
@@ -41,7 +41,7 @@ public class ExternalHandlerImpl implements Handler{
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response) {
-        String url = request.getRequestURI();
+        String url = request.getServletPath();
         ServiceConfigDto serviceConfig = serviceConfigCache.getValue(url);
         if (serviceConfig.getMockType() == MockTypeEnum.Coded) {
             hardCodeProcessor.process(serviceConfig.getClassHandler(), request, response);

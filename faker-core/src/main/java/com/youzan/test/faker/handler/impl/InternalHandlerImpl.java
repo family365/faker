@@ -23,7 +23,7 @@ public class InternalHandlerImpl implements Handler {
 
     @Override
     public boolean supports(HttpServletRequest request) {
-        String requestUrl = request.getRequestURI();
+        String requestUrl = request.getServletPath();
         Map<String, String> serviceRouter = serviceRouterLoader.load();
         if (serviceRouter.containsKey(requestUrl)) {
             return true;
@@ -34,7 +34,7 @@ public class InternalHandlerImpl implements Handler {
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response) {
-        String requestUrl = request.getRequestURI();
+        String requestUrl = request.getServletPath();
         Map<String, String> serviceRouter = serviceRouterLoader.load();
         String className = serviceRouter.get(requestUrl);
         hardCodeProcessor.process(className, request, response);
