@@ -1,5 +1,6 @@
 package com.youzan.test.faker.util;
 
+import com.youzan.test.faker.api.exception.FakerOperationException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Constructor;
@@ -16,7 +17,7 @@ public class ReflectiveUtil {
             classObj = Class.forName(className);
         } catch (ClassNotFoundException e) {
             log.error("ClassNotFoundException: {}", className);
-            throw new RuntimeException("ClassNotFoundException: " + className);
+            throw new FakerOperationException("ClassNotFoundException: " + className);
         }
 
         return classObj;
@@ -30,13 +31,17 @@ public class ReflectiveUtil {
 
         int parameterCount = constructorList[0].getParameterCount();
         if (parameterCount != 0) {
-            throw new RuntimeException("Contructor should be default contructor");
+            throw new FakerOperationException("Contructor should be default contructor");
         }
 
         return constructorList[0];
     }
 
-    public static Object createInstance(Constructor constructor) throws Exception{
-        return  constructor.newInstance(new Object[0]);
+    public static Object createInstance(Constructor constructor) {
+        try {
+            return constructor.newInstance(new Object[0]);
+        } catch (Exception e) {
+            throw new FakerOperationException(e.getMessage());
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.youzan.test.faker.handler;
 
+import com.youzan.test.faker.api.exception.FakerOperationException;
 import com.youzan.test.faker.handler.impl.ExternalHandlerImpl;
 import com.youzan.test.faker.handler.impl.InternalHandlerImpl;
 import org.springframework.stereotype.Component;
@@ -24,7 +25,7 @@ public class HandlerFactory {
         } else if (externalHandler.supports(reqest)) {
             return externalHandler;
         } else {
-            throw new RuntimeException("cannot find the handler to process your request");
+            throw new FakerOperationException("cannot find the handler to process your request");
         }
     }
 }

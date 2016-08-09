@@ -1,5 +1,6 @@
 package com.youzan.test.faker.api.service;
 
+import com.youzan.test.faker.api.cache.Cache;
 import com.youzan.test.faker.api.dto.ExpectationDto;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,6 +16,7 @@ public abstract class AbstractBaseHttpRequest {
     protected HttpServletRequest httpServletRequest;
     protected HttpServletResponse httpServletResponse;
     protected Map<String, Object> request2Map;
+    protected Cache cache;
 
     public void setHttpServletRequest(HttpServletRequest request) {
         if (request == null) {
@@ -31,6 +33,10 @@ public abstract class AbstractBaseHttpRequest {
         }
 
         httpServletResponse = response;
+    }
+
+    public void setCache(Cache cache) {
+        this.cache = cache;
     }
 
     public Map<String, Object> getRequestMap() {
@@ -54,7 +60,7 @@ public abstract class AbstractBaseHttpRequest {
         return httpServletRequest.getServletPath();
     }
 
-    public abstract String getResponse(ExpectationDto expectation);
+    public abstract String getResponse(Map<String, Object> expectation);
 
     public abstract String callRealMethod();
 }

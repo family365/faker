@@ -2,6 +2,7 @@ package com.youzan.test.faker.processor;
 
 import com.alibaba.fastjson.JSON;
 import com.youzan.test.faker.api.dto.ExpectationDto;
+import com.youzan.test.faker.api.exception.FakerOperationException;
 import com.youzan.test.faker.service.ExpectationCenterService;
 import com.youzan.test.faker.service.FootprintService;
 import com.youzan.test.faker.task.CallbackTask;
@@ -52,7 +53,7 @@ public class GeneralizedProcessor {
             try {
                 printer = response.getWriter();
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new FakerOperationException(e.getMessage());
             }
             printer.write(expectationDto.getResponseData());
         }

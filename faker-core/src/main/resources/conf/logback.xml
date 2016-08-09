@@ -1,0 +1,49 @@
+<configuration scan="true" scanPeriod=" 5 seconds" debug="false">
+    <jmxConfigurator/>
+
+    <property name="LOG_PATH" value="log"/>
+    <property name="APP_NAME" value="faker" />
+
+
+    <!--业务日志输出格式-->
+    <property name="OUTPUT_PATTERN"
+              value="%d [%thread] %-5level %logger{15} - %msg%n" />
+
+    <!--日志文件保留最大天数-->
+    <property name="MAX_DAY" value="30"/>
+    <property name="MAX_SIZE" value="100mb" />
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${OUTPUT_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="BUSINESS" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${LOG_PATH}/faker.log</File>
+        <encoder>
+            <pattern>${OUTPUT_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="SQL" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${LOG_PATH}/sql.log</File>
+        <encoder>
+            <pattern>${OUTPUT_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="logback" level="INFO" additivity="false"/>
+    <logger name="org.eclipse.jetty.util.component" level="INFO" additivity="false"/>
+
+    <logger name="com.youzan.test.faker" level="INFO" additivity="false">
+        <appender-ref ref="BUSINESS"/>
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="BUSINESS"/>
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+</configuration>

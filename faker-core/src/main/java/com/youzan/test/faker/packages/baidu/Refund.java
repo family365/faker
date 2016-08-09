@@ -1,6 +1,5 @@
 package com.youzan.test.faker.packages.baidu;
 
-import com.youzan.test.faker.api.dto.ExpectationDto;
 import com.youzan.test.faker.api.service.AbstractBaseHttpRequest;
 import com.youzan.test.faker.packages.baidu.util.Helper;
 import com.youzan.test.faker.util.DatetimeUtil;
@@ -13,7 +12,7 @@ import java.util.Map;
  */
 public class Refund extends AbstractBaseHttpRequest{
     @Override
-    public String getResponse(ExpectationDto expectation) {
+    public String getResponse(Map<String, Object> expectation) {
         final String CashBackAmount = "cashback_amount";
         final String SpNo = "sp_no";
         final String OrderNo = "order_no";
@@ -22,25 +21,23 @@ public class Refund extends AbstractBaseHttpRequest{
         final String RetCode = "ret_code";
         final String RetDetail = "ret_detail";
 
-        Map<String, String> expParam = expectation != null ? expectation.getExpectation() : null;
-
         String cashBackAmount;
         String spNo;
         String orderNo;
         String spRefundNo;
         String retCode;
-        if (expParam == null) {
+        if (expectation == null || expectation.isEmpty()) {
             cashBackAmount = (String) this.request2Map.get(CashBackAmount);
             spNo = (String) this.request2Map.get(SpNo);
             orderNo = (String) this.request2Map.get(OrderNo);
             spRefundNo = (String) this.request2Map.get(SpRefundNo);
             retCode = "1";
         } else {
-            cashBackAmount = expParam.getOrDefault(CashBackAmount, (String) this.request2Map.get(CashBackAmount));
-            spNo = expParam.getOrDefault(SpNo, (String) this.request2Map.get(SpNo));
-            orderNo = expParam.getOrDefault(OrderNo, (String) this.request2Map.get(OrderNo));
-            spRefundNo = expParam.getOrDefault(SpRefundNo, (String) this.request2Map.get(SpRefundNo));
-            retCode = expParam.getOrDefault(RetCode, "1");
+            cashBackAmount = (String) expectation.getOrDefault(CashBackAmount, this.request2Map.get(CashBackAmount));
+            spNo = (String) expectation.getOrDefault(SpNo, this.request2Map.get(SpNo));
+            orderNo = (String) expectation.getOrDefault(OrderNo, this.request2Map.get(OrderNo));
+            spRefundNo = (String) expectation.getOrDefault(SpRefundNo, this.request2Map.get(SpRefundNo));
+            retCode = (String) expectation.getOrDefault(RetCode, "1");
         }
 
         Map<String, String> responseMap = new HashMap<>();

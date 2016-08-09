@@ -1,11 +1,9 @@
 package com.youzan.test.faker.packages.baidu;
 
-import com.youzan.test.faker.api.dto.ExpectationDto;
 import com.youzan.test.faker.api.service.AbstractBaseHttpRequest;
 import com.youzan.test.faker.packages.baidu.util.Helper;
+import org.apache.commons.lang.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -14,8 +12,8 @@ import java.util.TreeMap;
  */
 public class PayQuery extends AbstractBaseHttpRequest {
     @Override
-    public String getResponse(ExpectationDto expectation) {
-        TreeMap<String, String> parameterMap = creatQueryParameter(request2Map);
+    public String getResponse(Map<String, Object> expectation) {
+        TreeMap<String, String> parameterMap = createQueryParameter(expectation);
         return Helper.generateXml(parameterMap);
     }
 
@@ -25,13 +23,23 @@ public class PayQuery extends AbstractBaseHttpRequest {
     }
 
 
-    private TreeMap<String, String> creatQueryParameter(Map<String, Object> params) {
+    private TreeMap<String, String> createQueryParameter(Map<String, Object> expectation) {
         TreeMap<String, String> parameterMap = new TreeMap<String, String>();
-        String payAmount = "10.00"; ////TODO: 使用redis来作为缓存 localCacheStore.get(params.get("order_no"))).get("total_amount")
+        String payAmount = (String) cache.get("order_no");
+        if (StringUtils.isEmpty(payAmount)) {
+            //TODO: 如果这里拿不到数据, 改如何响应
+            payAmount = "-1";
+        }
+
+        String payResult = "1";
+        if (expectation != null && !expectation.isEmpty()) {
+            payResult = (String) expectation.getOrDefault("pay_result", "1");
+        }
+
         parameterMap.put("query_status", "0");
-        parameterMap.put("bfb_order_no", params.get("order_no") + "12345");
-        parameterMap.put("order_no", params.get("order_no").toString());
-        parameterMap.put("pay_result", "1");
+        parameterMap.put("bfb_order_no", request2Map.get("order_no") + "12345");
+        parameterMap.put("order_no", request2Map.get("order_no").toString());
+        parameterMap.put("pay_result", payResult);
         parameterMap.put("total_amount", payAmount);
 
         return parameterMap;

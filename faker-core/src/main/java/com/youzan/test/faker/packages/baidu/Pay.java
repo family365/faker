@@ -1,13 +1,8 @@
 package com.youzan.test.faker.packages.baidu;
 
-
-import com.youzan.test.faker.api.dto.ExpectationDto;
 import com.youzan.test.faker.api.service.AbstractHttpRedirectRequest;
 import com.youzan.test.faker.packages.baidu.util.Helper;
 import com.youzan.test.faker.util.DatetimeUtil;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -15,7 +10,7 @@ import java.util.TreeMap;
  * Created by libaixian on 16/7/30.
  */
 public class Pay extends AbstractHttpRedirectRequest{
-    private static final String ReturnURL = "www.baidu.com"; //"http://trade.koudaitong.com/pay/baiduwap/return";
+    private static final String ReturnURL = "http://www.baidu.com"; //"http://trade.koudaitong.com/pay/baiduwap/return";
 
     @Override
     public String getRedirectURL() {
@@ -23,8 +18,8 @@ public class Pay extends AbstractHttpRedirectRequest{
     }
 
     @Override
-    public String getResponse(ExpectationDto expectation) {
-        TreeMap<String, String> parameterMap = creatPayParameter(request2Map);
+    public String getResponse(Map<String, Object> expectation) {
+        TreeMap<String, String> parameterMap = creatPayParameter(expectation);
         String sign = Helper.createSign(parameterMap);
         return Helper.combineData(parameterMap) + "&sign=" + sign;
     }
@@ -34,8 +29,14 @@ public class Pay extends AbstractHttpRedirectRequest{
         return null;
     }
 
-    private TreeMap<String, String> creatPayParameter(Map<String, Object> params) {
+    private TreeMap<String, String> creatPayParameter(Map<String, Object> expectation) {
         TreeMap<String, String> parameterMap = new TreeMap<String, String>();
+        Map<String, Object> params = request2Map;
+
+        String payResult = "1";
+        if (expectation != null && !expectation.isEmpty()) {
+            payResult = (String) expectation.getOrDefault("pay_result", 1);
+        }
 
         parameterMap.put("bank_no", params.get("bank_no").toString());
         parameterMap.put("bfb_order_create_time", DatetimeUtil.getStrNowTime());
@@ -46,7 +47,7 @@ public class Pay extends AbstractHttpRedirectRequest{
         parameterMap.put("fee_amount", "0");
         parameterMap.put("input_charset", params.get("input_charset").toString());
         parameterMap.put("order_no", params.get("order_no").toString());
-        parameterMap.put("pay_result", "1");
+        parameterMap.put("pay_result", payResult);
         parameterMap.put("pay_time", DatetimeUtil.getStrNowTime());
         parameterMap.put("pay_type", params.get("pay_type").toString());
         parameterMap.put("sign_method", params.get("sign_method").toString());
@@ -57,8 +58,7 @@ public class Pay extends AbstractHttpRedirectRequest{
         parameterMap.put("unit_count", params.get("unit_count").toString());
         parameterMap.put("version", params.get("version").toString());
 
-        //TODO: 使用redis来作为缓存
-        //localCacheStore.put(params.get("order_no"), parameterMap);
+        cache.put((String) params.get("order_no"), parameterMap.get("total_amount"));
         return parameterMap;
     }
 }

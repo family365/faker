@@ -1,7 +1,9 @@
 package com.youzan.test.faker.processor;
 
 import com.alibaba.fastjson.JSON;
+import com.youzan.test.faker.api.cache.Cache;
 import com.youzan.test.faker.api.dto.ExpectationDto;
+import com.youzan.test.faker.api.exception.FakerOperationException;
 import com.youzan.test.faker.api.service.AbstractBaseHttpRequest;
 import com.youzan.test.faker.api.service.AbstractHttpCallbackRequest;
 import com.youzan.test.faker.api.service.AbstractHttpRedirectRequest;
@@ -10,8 +12,9 @@ import com.youzan.test.faker.service.FootprintService;
 import com.youzan.test.faker.task.CallbackTask;
 import com.youzan.test.faker.util.HttpRequestUtil;
 import com.youzan.test.faker.util.ReflectiveUtil;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -27,7 +30,6 @@ import java.util.Map;
 /**
  * Created by libaixian on 16/8/1.
  */
-@Slf4j
 @Component
 public class HardCodeProcessor {
     @Resource
@@ -39,8 +41,13 @@ public class HardCodeProcessor {
     @Resource
     private FootprintService footprintService;
 
+    @Resource
+    private Cache autoExpiredCache;
+
+    private static final Logger logger = LoggerFactory.getLogger(HardCodeProcessor.class);
     private static final String HttpServletRequestSetter = "setHttpServletRequest";
     private static final String HttpServletResponseSetter = "setHttpServletResponse";
+    private static final String CacheSetter = "setCache";
     private static final String Request2MapGetter = "getRequestMap";
     private static final String ExpectationKey = "getExpectationKey";
     private static final String GetResponse = "getResponse";
@@ -51,6 +58,7 @@ public class HardCodeProcessor {
 
     public void process(String className, HttpServletRequest request, HttpServletResponse response) {
         try {
+            logger.info("{} will be used to process the request", className);
             Class classObj = ReflectiveUtil.classForName(className);
             Constructor constructor = ReflectiveUtil.getDefaultContructor(classObj);
             Object instance = ReflectiveUtil.createInstance(constructor);
@@ -86,22 +94,30 @@ public class HardCodeProcessor {
                 baseRequestProcessor(classObj, instance, request, response, expectationDto);
                 return;
             }
-
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        } catch (NoSuchMethodException e) {
+            throw new FakerOperationException(e.getMessage());
+        } catch (IllegalAccessException e) {
+            throw new FakerOperationException(e.getMessage());
+        } catch (InvocationTargetException e) {
+            throw new FakerOperationException(e.getMessage());
+        } catch (IOException e) {
+            throw new FakerOperationException(e.getMessage());
         }
     }
 
-    private void populateFields(Class type, Object instance, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    private void populateFields(Class type, Object instance, HttpServletRequest request, HttpServletResponse response) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException{
         Method setRequestMethod = type.getMethod(HttpServletRequestSetter, HttpServletRequest.class);
         setRequestMethod.invoke(instance, request);
 
         Method setResponseMethod = type.getMethod(HttpServletResponseSetter, HttpServletResponse.class);
         setResponseMethod.invoke(instance, response);
+
+        Method setCacheMethod = type.getMethod(CacheSetter, Cache.class);
+        setCacheMethod.invoke(instance, autoExpiredCache);
     }
 
     private void baseRequestProcessor(Class<?> type, Object instance, HttpServletRequest request,
-                                      HttpServletResponse response, ExpectationDto expectationDto) throws Exception {
+                                      HttpServletResponse response, ExpectationDto expectationDto) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, IOException {
         if (expectationDto != null && expectationDto.isHandOver2RealMethod()) {
             Method realMethod = type.getMethod(CallRealMethod);
             realMethod.invoke(instance);
@@ -112,7 +128,7 @@ public class HardCodeProcessor {
     }
 
     private void callbackRequestProcessor(Class<?> type, Object instance, HttpServletRequest request,
-                                          HttpServletResponse response, ExpectationDto expectationDto) throws Exception {
+                                          HttpServletResponse response, ExpectationDto expectationDto) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, IOException {
         if (expectationDto.isHandOver2RealMethod()) {
             Method realMethod = type.getMethod(CallRealMethod);
             realMethod.invoke(instance);
@@ -125,7 +141,7 @@ public class HardCodeProcessor {
 
 
     private void redirectRequestProcessor(Class<?> type, Object instance, HttpServletResponse response,
-                                         ExpectationDto expectationDto) throws Exception {
+                                         ExpectationDto expectationDto) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, IOException {
         if (expectationDto != null && expectationDto.isHandOver2RealMethod()) {
             Method realMethod = type.getMethod(CallRealMethod);
             realMethod.invoke(instance);
@@ -141,13 +157,23 @@ public class HardCodeProcessor {
 
         Method redirectURLGetter = type.getMethod(GetRedirectURL);
         redirectURL = (String) redirectURLGetter.invoke(instance);
-
-        String retMessage = getResponseData(type, instance, expectationDto);
-        if (!redirectURL.endsWith("/")) {
-            redirectURL.substring(0, redirectURL.length() -1);
+        if (StringUtils.isEmpty(redirectURL)) {
+            throw new FakerOperationException("redirect URL cannot be null or empty");
         }
 
-        response.sendRedirect(redirectURL + "?" + retMessage);
+        String retMessage = getResponseData(type, instance, expectationDto);
+        if (redirectURL.endsWith("/")) {
+            redirectURL = redirectURL.substring(0, redirectURL.length() -1);
+        }
+
+        String redirectContent = null;
+        if (!StringUtils.isEmpty(retMessage)) {
+            redirectContent = redirectURL + "?" + retMessage;
+        } else {
+            redirectContent = redirectURL;
+        }
+
+        response.sendRedirect(redirectContent);
     }
 
 
@@ -173,6 +199,11 @@ public class HardCodeProcessor {
             callBackURL = (String) callbackURLGetter.invoke(instance);
         }
 
+        if (StringUtils.isEmpty(callBackURL)) {
+            logger.info("callback URL is empty, ignore the callback operation");
+            return;
+        }
+
         String callbackData;
         if (expectationDto != null && !StringUtils.isEmpty(expectationDto.getBgCallbackData())) {
             callbackData = expectationDto.getBgCallbackData();
@@ -194,8 +225,9 @@ public class HardCodeProcessor {
         if (expectationDto != null && !StringUtils.isEmpty(expectationDto.getResponseData())) {
             retMessage = expectationDto.getResponseData();
         } else {
-            Method getResponseMethod = type.getMethod(GetResponse, ExpectationDto.class);
-            retMessage = (String) getResponseMethod.invoke(instance, expectationDto);
+            Map<String, Object> expectation = expectationDto == null ? null : expectationDto.getExpectation();
+            Method getResponseMethod = type.getMethod(GetResponse, Map.class);
+            retMessage = (String) getResponseMethod.invoke(instance, expectation);
         }
 
         return retMessage;
