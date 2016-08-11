@@ -22,6 +22,8 @@
         <bit-common.version>1.0.0-SNAPSHOT</bit-common.version>
         <trade-cache.version>1.0.3-SNAPSHOT</trade-cache.version>
         <guava-version>18.0</guava-version>
+        <fastjson.version>1.2.7</fastjson.version>
+        <common-mode.version>1.0.0</common-mode.version>
     </properties>
 
     <dependencyManagement>
@@ -126,6 +128,44 @@
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
                 <version>${lockback.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.youzan.test</groupId>
+                <artifactId>bit-common</artifactId>
+                <version>${bit-common.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.testng</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.projectlombok</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.alibaba</groupId>
+                        <artifactId>fastjson</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.youzan</groupId>
+                        <artifactId>common-model</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>

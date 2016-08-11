@@ -66,7 +66,7 @@ public class HardCodeProcessor {
             if (!AbstractHttpRedirectRequest.class.isAssignableFrom(classObj)
                     && !AbstractHttpCallbackRequest.class.isAssignableFrom(classObj)
                     && !AbstractBaseHttpRequest.class.isAssignableFrom(classObj)) {
-                throw new RuntimeException("Not supported class, the class is expected to derived from AbstractBaseHttpRequest, AbstractHttpCallbackRequest or AbstractHttpRedirectRequest");
+                throw new FakerOperationException("Not supported class, the class is expected to derived from AbstractBaseHttpRequest, AbstractHttpCallbackRequest or AbstractHttpRedirectRequest");
             }
 
             populateFields(classObj, instance, request, response);
@@ -183,7 +183,7 @@ public class HardCodeProcessor {
         if (expectationDto != null && expectationDto.isSaveFootprint()) {
             Map<String, Object> requestMap = HttpRequestUtil.convertToMap(request);
             String requestStr = JSON.toJSONString(requestMap);
-            footprintService.saveFootprint(expectationDto.getRequestUrl(), requestStr, retMessage);
+            footprintService.saveFootprint(request.getServletPath(), requestStr, retMessage);
         }
 
         PrintWriter printer = response.getWriter();

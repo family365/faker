@@ -17,14 +17,13 @@ public class InjectedExpectationService {
     @Resource
     private InjectedExpectationCache cache;
 
-    public void save(String key, String expectation) {
-        //TODO: expectation是从request中获取到的字符串, 内容是ExpectationDto对象序列化后的字符串
-        // 反序列化后, 保存到缓存中
+    public void save(String key, ExpectationDto expectationDto) {
+        cache.setValue(key, expectationDto);
     }
 
     public ExpectationDto get(String key) {
         ExpectationDto expectation = cache.getValue(key);
-        cache.setExpired(key);
+        cache.remove(key);
         return expectation;
     }
 

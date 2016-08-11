@@ -12,6 +12,11 @@ import java.util.Map;
  */
 public class Refund extends AbstractBaseHttpRequest{
     @Override
+    public String getRequestKey() {
+        return request2Map.get("order_no").toString();
+    }
+
+    @Override
     public String getResponse(Map<String, Object> expectation) {
         final String CashBackAmount = "cashback_amount";
         final String SpNo = "sp_no";

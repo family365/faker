@@ -18,6 +18,11 @@ public class Pay extends AbstractHttpRedirectRequest{
     }
 
     @Override
+    public String getRequestKey() {
+        return request2Map.get("order_no").toString();
+    }
+
+    @Override
     public String getResponse(Map<String, Object> expectation) {
         TreeMap<String, String> parameterMap = creatPayParameter(expectation);
         String sign = Helper.createSign(parameterMap);

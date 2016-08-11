@@ -45,7 +45,7 @@ public class GeneralizedProcessor {
         if (expectationDto.isSaveFootprint()) {
             Map<String, Object> requestMap = HttpRequestUtil.convertToMap(request);
             String requestStr = JSON.toJSONString(requestMap);
-            footprintService.saveFootprint(expectationDto.getRequestUrl(), requestStr, expectationDto.getResponseData());
+            footprintService.saveFootprint(url, requestStr, expectationDto.getResponseData());
         }
 
         if (!StringUtils.isEmpty(expectationDto.getResponseData())) {

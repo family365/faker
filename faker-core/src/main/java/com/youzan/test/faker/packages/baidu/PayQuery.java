@@ -12,6 +12,11 @@ import java.util.TreeMap;
  */
 public class PayQuery extends AbstractBaseHttpRequest {
     @Override
+    public String getRequestKey() {
+        return request2Map.get("order_no").toString();
+    }
+
+    @Override
     public String getResponse(Map<String, Object> expectation) {
         TreeMap<String, String> parameterMap = createQueryParameter(expectation);
         return Helper.generateXml(parameterMap);

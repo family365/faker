@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="exploded-war" name="faker-core:war exploded">
-    <output-path>$PROJECT_DIR$/faker-core/target/faker-core</output-path>
+    <output-path>$PROJECT_DIR$/faker-core/target/faker</output-path>
     <root id="root">
       <element id="directory" name="WEB-INF">
         <element id="directory" name="classes">
@@ -38,7 +38,7 @@
         </element>
       </element>
       <element id="directory" name="META-INF">
-        <element id="file-copy" path="$PROJECT_DIR$/faker-core/target/faker-core/META-INF/MANIFEST.MF" />
+        <element id="file-copy" path="$PROJECT_DIR$/faker-core/target/faker/META-INF/MANIFEST.MF" />
       </element>
       <element id="javaee-facet-resources" facet="faker-core/web/Web" />
     </root>

@@ -24,5 +24,15 @@
             <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.youzan.test.faker</groupId>
+            <artifactId>faker-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.youzan.test</groupId>
+            <artifactId>bit-common</artifactId>
+        </dependency>
     </dependencies>
 </project>

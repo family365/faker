@@ -88,6 +88,11 @@
         </dependency>
 
         <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>com.youzan.test.faker</groupId>
             <artifactId>faker-api</artifactId>
             <version>${project.version}</version>
@@ -95,6 +100,6 @@
     </dependencies>
 
     <build>
-        <finalName>faker-core</finalName>
+        <finalName>faker</finalName>
     </build>
 </project>

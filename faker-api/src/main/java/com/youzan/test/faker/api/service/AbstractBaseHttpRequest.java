@@ -43,7 +43,10 @@ public abstract class AbstractBaseHttpRequest {
         return request2Map;
     }
 
-    //对于请求参数不是一般的key, value值的, 需要重写这个方法, 以获取正确的request参数map
+    /**
+     * 对于请求参数不是一般的key, value值的, 而是比如说是xml, 需要重写这个方法, 以获取正确的request中的参数map
+     * @return
+     */
     protected Map<String, Object> convertRequest2Map() {
         Map<String, Object> request2Map = new HashMap();
         Enumeration paramNames = this.httpServletRequest.getParameterNames();
@@ -56,11 +59,33 @@ public abstract class AbstractBaseHttpRequest {
         return request2Map;
     }
 
+    /**
+     * 针对本次的请求, 保存请求记录时默认的是保存请求格式为 URL & request + response
+     * 如果你想方便以后的查询,可以给本次请求一个标签,来唯一标识本次的请求信息, 请求记录将会保存为 URL + requestKey & request + response
+     * @return
+     */
+    public String getRequestKey() {
+        return null;
+    }
+
+    /**
+     * 指定获取期望值的key值, 将根据这个key从缓存中获取对应的期望值, 默认为请求的URL
+     * @return
+     */
     public String getExpectationKey() {
         return httpServletRequest.getServletPath();
     }
 
+    /**
+     * 根据requst 和 expectation来生成响应的报文
+     * @param expectation
+     * @return
+     */
     public abstract String getResponse(Map<String, Object> expectation);
 
+    /**
+     * 向真实的第三方发起请求, 并返回第三方返回的报文
+     * @return
+     */
     public abstract String callRealMethod();
 }

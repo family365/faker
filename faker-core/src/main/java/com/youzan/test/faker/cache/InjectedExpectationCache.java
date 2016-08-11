@@ -11,14 +11,14 @@ public class InjectedExpectationCache {
     private LocalCache<ExpectationDto> cache = new LocalCache<>();
 
     public ExpectationDto getValue(String key) {
-        return null;
+        return cache.getValue(key);
     }
 
     public void setValue(String key, ExpectationDto expectationDto) {
-
+        cache.setValue(key, expectationDto);
     }
 
-    public boolean setExpired(String key) {
-        return true;
+    public void remove(String key) {
+        cache.remove(key);
     }
 }

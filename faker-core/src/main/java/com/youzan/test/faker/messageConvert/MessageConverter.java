@@ -43,13 +43,13 @@ public class MessageConverter {
     public Map<String, String> convert(Map<String, String> srcMap, Map<String, Object> data) {
         if (srcMap == null || srcMap.isEmpty()
                 || data == null || data.isEmpty()) {
-            return null;
+            return srcMap;
         }
 
         Map<String, String> newMap = new HashMap<>();
-        for (Map.Entry<String, String> entry : newMap.entrySet()) {
+        for (Map.Entry<String, String> entry : srcMap.entrySet()) {
             String key = entry.getKey();
-            String value = entry.getValue();
+            String value = String.valueOf(entry.getValue());
             String afterConvert = convert(value, data);
             newMap.put(key, afterConvert);
         }
@@ -59,6 +59,6 @@ public class MessageConverter {
 
     private String variableReplace(String src, Map<String, Object> data) {
         //TODO: 把字符串中包含${var}模式的字符串替换成data中相对应的值
-        return null;
+        return src;
     }
 }
