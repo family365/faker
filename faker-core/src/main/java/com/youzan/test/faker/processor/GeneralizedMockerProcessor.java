@@ -50,7 +50,7 @@ public class GeneralizedMockerProcessor {
 
         if (!StringUtils.isEmpty(expectationDto.getResponseData())) {
             response.setCharacterEncoding("UTF-8");
-            
+
             try {
                 PrintWriter printer = response.getWriter();
                 printer.write(expectationDto.getResponseData());
@@ -58,6 +58,5 @@ public class GeneralizedMockerProcessor {
                 throw new FakerOperationException(e.getMessage());
             }
         }
-
     }
 }
