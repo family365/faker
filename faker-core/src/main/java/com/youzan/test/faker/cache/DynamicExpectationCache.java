@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
  * Created by libaixian on 16/8/2.
  */
 @Component
-public class InjectedExpectationCache {
+public class DynamicExpectationCache {
     private LocalCache<ExpectationDto> cache = new LocalCache<>();
 
     public ExpectationDto getValue(String key) {

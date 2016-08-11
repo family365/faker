@@ -16,7 +16,7 @@ import java.util.Map;
 @Service
 public class ExpectationCenterService {
     @Resource
-    private InjectedExpectationService injectedExpectationService;
+    private DynamicExpectationService dynamicExpectationService;
 
     @Resource
     private RegularExpectationService regularExpectationService;
@@ -25,21 +25,19 @@ public class ExpectationCenterService {
     private MessageConverter messageConverter;
 
     public ExpectationDto process(String expectationKey, Map<String, Object> requestMap) {
-
-        ExpectationDto expectationDto = injectedExpectationService.get(expectationKey);
+        ExpectationDto expectationDto = dynamicExpectationService.get(expectationKey);
         if (expectationDto == null) {
             expectationDto = regularExpectationService.get(expectationKey, requestMap);
         }
 
         if(expectationDto == null) {
             //TODO: load serviceConfig,
-            // 当期望值为null时, 按照mock接口的默认设置来相应请求
+            // 当期望值为null时, 按照mock接口的默认设置来响应请求
             ServiceConfigDto serviceConfigDto = null;
             expectationDto = convertServiceConfigToExpe(serviceConfigDto);
         }
 
         if (expectationDto != null) {
-
             if (expectationDto.isThrowException()) {
                 throw new FakerResponseException();
             }

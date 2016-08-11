@@ -31,7 +31,7 @@ import java.util.Map;
  * Created by libaixian on 16/8/1.
  */
 @Component
-public class HardCodeProcessor {
+public class HardCodeMockerProcessor {
     @Resource
     private ExpectationCenterService expectationCenterService;
 
@@ -44,7 +44,7 @@ public class HardCodeProcessor {
     @Resource
     private Cache autoExpiredCache;
 
-    private static final Logger logger = LoggerFactory.getLogger(HardCodeProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(HardCodeMockerProcessor.class);
     private static final String HttpServletRequestSetter = "setHttpServletRequest";
     private static final String HttpServletResponseSetter = "setHttpServletResponse";
     private static final String CacheSetter = "setCache";
@@ -55,33 +55,35 @@ public class HardCodeProcessor {
     private static final String GetCallbackUrl = "getCallbackUrl";
     private static final String GetCallbackData = "getCallbackData";
     private static final String GetRedirectURL = "getRedirectURL";
+    private static final String GetRequestKey = "getRequestKey";
 
     public void process(String className, HttpServletRequest request, HttpServletResponse response) {
         try {
-            logger.info("{} will be used to process the request", className);
             Class classObj = ReflectiveUtil.classForName(className);
-            Constructor constructor = ReflectiveUtil.getDefaultContructor(classObj);
-            Object instance = ReflectiveUtil.createInstance(constructor);
-
             if (!AbstractHttpRedirectRequest.class.isAssignableFrom(classObj)
                     && !AbstractHttpCallbackRequest.class.isAssignableFrom(classObj)
                     && !AbstractBaseHttpRequest.class.isAssignableFrom(classObj)) {
                 throw new FakerOperationException("Not supported class, the class is expected to derived from AbstractBaseHttpRequest, AbstractHttpCallbackRequest or AbstractHttpRedirectRequest");
             }
 
-            populateFields(classObj, instance, request, response);
-            //TODO: load Expectation,
-            // 1. 包括调用接口设置的期望值, 使用过一次后即丢弃
-            // 2. 还有在管理平台上设置的期望管理平台上的期望值, 需要进行根据请求信息进行过滤
+            Constructor constructor = ReflectiveUtil.getDefaultContructor(classObj);
+            Object instance = ReflectiveUtil.createInstance(constructor);
+            injectFields(classObj, instance, request, response);
+
             Method requestMapGetterMethod = classObj.getMethod(Request2MapGetter);
             Map<String, Object> requestMap = (Map<String, Object>) requestMapGetterMethod.invoke(instance);
             Method expectationKeyGetterMethod = classObj.getMethod(ExpectationKey);
             String expectationKey = (String) expectationKeyGetterMethod.invoke(instance);
-
             ExpectationDto expectationDto = expectationCenterService.process(expectationKey, requestMap);
 
+            if (expectationDto.isHandOver2RealMethod()) {
+                Method realMethod = classObj.getMethod(CallRealMethod);
+                realMethod.invoke(instance);
+                return;
+            }
+
             if (AbstractHttpRedirectRequest.class.isAssignableFrom(classObj)) {
-                redirectRequestProcessor(classObj, instance, response, expectationDto);
+                redirectRequestProcessor(classObj, instance, request, response, expectationDto);
                 return;
             }
 
@@ -105,7 +107,7 @@ public class HardCodeProcessor {
         }
     }
 
-    private void populateFields(Class type, Object instance, HttpServletRequest request, HttpServletResponse response) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException{
+    private void injectFields(Class type, Object instance, HttpServletRequest request, HttpServletResponse response) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException{
         Method setRequestMethod = type.getMethod(HttpServletRequestSetter, HttpServletRequest.class);
         setRequestMethod.invoke(instance, request);
 
@@ -116,49 +118,19 @@ public class HardCodeProcessor {
         setCacheMethod.invoke(instance, autoExpiredCache);
     }
 
-    private void baseRequestProcessor(Class<?> type, Object instance, HttpServletRequest request,
-                                      HttpServletResponse response, ExpectationDto expectationDto) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, IOException {
-        if (expectationDto != null && expectationDto.isHandOver2RealMethod()) {
-            Method realMethod = type.getMethod(CallRealMethod);
-            realMethod.invoke(instance);
-            return;
-        }
-
-        response(type, instance, request, response, expectationDto);
-    }
-
-    private void callbackRequestProcessor(Class<?> type, Object instance, HttpServletRequest request,
-                                          HttpServletResponse response, ExpectationDto expectationDto) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, IOException {
-        if (expectationDto.isHandOver2RealMethod()) {
-            Method realMethod = type.getMethod(CallRealMethod);
-            realMethod.invoke(instance);
-            return;
-        }
-
-        callback(type, instance, expectationDto);
-        response(type, instance, request, response, expectationDto);
-    }
-
-
-    private void redirectRequestProcessor(Class<?> type, Object instance, HttpServletResponse response,
+    private void redirectRequestProcessor(Class<?> type, Object instance, HttpServletRequest request, HttpServletResponse response,
                                          ExpectationDto expectationDto) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, IOException {
-        if (expectationDto != null && expectationDto.isHandOver2RealMethod()) {
-            Method realMethod = type.getMethod(CallRealMethod);
-            realMethod.invoke(instance);
-            return;
-        }
-
         callback(type, instance, expectationDto);
 
         String redirectURL = null;
         if (expectationDto != null && !StringUtils.isEmpty(expectationDto.getBgCallbackURL())) {
             redirectURL = expectationDto.getBgCallbackURL();
-        }
-
-        Method redirectURLGetter = type.getMethod(GetRedirectURL);
-        redirectURL = (String) redirectURLGetter.invoke(instance);
-        if (StringUtils.isEmpty(redirectURL)) {
-            throw new FakerOperationException("redirect URL cannot be null or empty");
+        } else {
+            Method redirectURLGetter = type.getMethod(GetRedirectURL);
+            redirectURL = (String) redirectURLGetter.invoke(instance);
+            if (StringUtils.isEmpty(redirectURL)) {
+                throw new FakerOperationException("redirect URL cannot be null or empty");
+            }
         }
 
         String retMessage = getResponseData(type, instance, expectationDto);
@@ -173,21 +145,22 @@ public class HardCodeProcessor {
             redirectContent = redirectURL;
         }
 
+        String contentType = request.getContentType();
+        String charset = request.getCharacterEncoding();
+        response.setContentType(contentType);
+        response.setCharacterEncoding(charset);
         response.sendRedirect(redirectContent);
     }
 
+    private void callbackRequestProcessor(Class<?> type, Object instance, HttpServletRequest request,
+                                          HttpServletResponse response, ExpectationDto expectationDto) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, IOException {
+        callback(type, instance, expectationDto);
+        response(type, instance, request, response, expectationDto);
+    }
 
-    private void response(Class<?> type, Object instance, HttpServletRequest request,
-                          HttpServletResponse response, ExpectationDto expectationDto) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, IOException {
-        String retMessage = getResponseData(type, instance, expectationDto);
-        if (expectationDto != null && expectationDto.isSaveFootprint()) {
-            Map<String, Object> requestMap = HttpRequestUtil.convertToMap(request);
-            String requestStr = JSON.toJSONString(requestMap);
-            footprintService.saveFootprint(request.getServletPath(), requestStr, retMessage);
-        }
-
-        PrintWriter printer = response.getWriter();
-        printer.write(retMessage);
+    private void baseRequestProcessor(Class<?> type, Object instance, HttpServletRequest request,
+                                      HttpServletResponse response, ExpectationDto expectationDto) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, IOException {
+        response(type, instance, request, response, expectationDto);
     }
 
     private void callback(Class<?> type, Object instance, ExpectationDto expectationDto) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
@@ -220,6 +193,26 @@ public class HardCodeProcessor {
         callbackTask.addCallbackTask(callBackURL, callbackData, callbackDelayTime);
     }
 
+    private void response(Class<?> type, Object instance, HttpServletRequest request,
+                          HttpServletResponse response, ExpectationDto expectationDto) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, IOException {
+        String retMessage = getResponseData(type, instance, expectationDto);
+        if (expectationDto != null && expectationDto.isSaveFootprint()) {
+            Map<String, Object> requestMap = HttpRequestUtil.convertToMap(request);
+            String requestStr = JSON.toJSONString(requestMap);
+
+            Method requestKeyGetterMethod = type.getMethod(GetRequestKey);
+            String requestKey = (String) requestKeyGetterMethod.invoke(instance);
+            footprintService.saveFootprint(request.getServletPath(), requestKey, requestStr, retMessage);
+        }
+
+        String contentType = request.getContentType();
+        String charset = request.getCharacterEncoding();
+        response.setContentType(contentType);
+        response.setCharacterEncoding(charset);
+        PrintWriter printer = response.getWriter();
+        printer.write(retMessage);
+    }
+
     private String getResponseData(Class<?> type, Object instance, ExpectationDto expectationDto) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         String retMessage;
         if (expectationDto != null && !StringUtils.isEmpty(expectationDto.getResponseData())) {
@@ -232,15 +225,4 @@ public class HardCodeProcessor {
 
         return retMessage;
     }
-
-    public static void main(String[] args) {
-        String a = "this is E${order_no}, today is $DATE(yyyy,d,-1)";
-        int startIndex = a.indexOf("$");
-        if (a.charAt(startIndex + 1) == '{') {
-            int endIndex = a.indexOf("}");
-            String varName = a.substring(startIndex + 2, endIndex);
-        }
-
-    }
-
 }

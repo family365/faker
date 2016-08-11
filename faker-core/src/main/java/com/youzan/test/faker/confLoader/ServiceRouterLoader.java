@@ -1,5 +1,6 @@
 package com.youzan.test.faker.confLoader;
 
+import com.youzan.test.faker.api.exception.FakerOperationException;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -63,10 +64,10 @@ public class ServiceRouterLoader {
                 return services;
             } catch (DocumentException e) {
                 logger.error("Run into an error when parsing service config file {} \n Exception: {}", this.ServiceRouterFile, e.getMessage());
-                throw new RuntimeException(e.getMessage());
+                throw new FakerOperationException(e.getMessage());
             } catch (Exception e) {
                 logger.error("Run into an error when parsing service config file {} \n Exception: {}", this.ServiceRouterFile, e.getMessage());
-                throw new RuntimeException(e.getMessage());
+                throw new FakerOperationException(e.getMessage());
             }
         }
     }

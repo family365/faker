@@ -2,8 +2,7 @@ package com.youzan.test.faker.facade;
 
 import com.youzan.test.faker.api.codec.ExpectationCodec;
 import com.youzan.test.faker.api.dto.ExpectationDto;
-import com.youzan.test.faker.cache.InjectedExpectationCache;
-import com.youzan.test.faker.service.InjectedExpectationService;
+import com.youzan.test.faker.service.DynamicExpectationService;
 import com.youzan.test.faker.util.HttpRequestUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +20,7 @@ import java.util.Map;
 @Controller
 public class ExpectationController {
     @Resource
-    private InjectedExpectationService cache;
+    private DynamicExpectationService cache;
 
     @RequestMapping("/setExpectation")
     public void setExpectation(HttpServletRequest request, HttpServletResponse response) {

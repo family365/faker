@@ -2,7 +2,7 @@ package com.youzan.test.faker.handler.impl;
 
 import com.youzan.test.faker.confLoader.ServiceRouterLoader;
 import com.youzan.test.faker.handler.Handler;
-import com.youzan.test.faker.processor.HardCodeProcessor;
+import com.youzan.test.faker.processor.HardCodeMockerProcessor;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -19,7 +19,7 @@ public class InternalHandlerImpl implements Handler {
     public ServiceRouterLoader serviceRouterLoader;
 
     @Resource
-    private HardCodeProcessor hardCodeProcessor;
+    private HardCodeMockerProcessor hardCodeMockerProcessor;
 
     @Override
     public boolean supports(HttpServletRequest request) {
@@ -37,6 +37,6 @@ public class InternalHandlerImpl implements Handler {
         String requestUrl = request.getServletPath();
         Map<String, String> serviceRouter = serviceRouterLoader.load();
         String className = serviceRouter.get(requestUrl);
-        hardCodeProcessor.process(className, request, response);
+        hardCodeMockerProcessor.process(className, request, response);
     }
 }

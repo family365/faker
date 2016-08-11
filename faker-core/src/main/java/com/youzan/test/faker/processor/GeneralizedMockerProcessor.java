@@ -21,7 +21,7 @@ import java.util.Map;
  * Created by libaixian on 16/8/1.
  */
 @Component
-public class GeneralizedProcessor {
+public class GeneralizedMockerProcessor {
     @Resource
     private ExpectationCenterService expectationCenterService;
 
@@ -45,17 +45,18 @@ public class GeneralizedProcessor {
         if (expectationDto.isSaveFootprint()) {
             Map<String, Object> requestMap = HttpRequestUtil.convertToMap(request);
             String requestStr = JSON.toJSONString(requestMap);
-            footprintService.saveFootprint(url, requestStr, expectationDto.getResponseData());
+            footprintService.saveFootprint(url, null, requestStr, expectationDto.getResponseData() );
         }
 
         if (!StringUtils.isEmpty(expectationDto.getResponseData())) {
-            PrintWriter printer = null;
+            response.setCharacterEncoding("UTF-8");
+            
             try {
-                printer = response.getWriter();
+                PrintWriter printer = response.getWriter();
+                printer.write(expectationDto.getResponseData());
             } catch (IOException e) {
                 throw new FakerOperationException(e.getMessage());
             }
-            printer.write(expectationDto.getResponseData());
         }
 
     }

@@ -1,21 +1,18 @@
 package com.youzan.test.faker.service;
 
 import com.youzan.test.faker.api.dto.ExpectationDto;
-import com.youzan.test.faker.cache.InjectedExpectationCache;
+import com.youzan.test.faker.cache.DynamicExpectationCache;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by libaixian on 16/8/2.
  */
 @Service
-public class InjectedExpectationService {
+public class DynamicExpectationService {
     @Resource
-    private InjectedExpectationCache cache;
+    private DynamicExpectationCache cache;
 
     public void save(String key, ExpectationDto expectationDto) {
         cache.setValue(key, expectationDto);

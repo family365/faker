@@ -13,8 +13,8 @@
             class="com.youzan.test.faker.packages.baidu.Refund"/>
 
     <service
-            url="/api/0/refund"
-            class="com.youzan.test.faker.packages.baidu.Refund"/>
+            url="/api/0/refundQuery"
+            class="com.youzan.test.faker.packages.baidu.RefundQuery"/>
 
 
 </services>

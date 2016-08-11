@@ -46,6 +46,10 @@ public class RegularExpectationService {
         return null;
     }
 
+    /**
+     * 懒加载, 根据key加载到缓存中
+     * @param key
+     */
     public void refresh(String key) {
         //TODO: 从数据库中抓取rule, 生成 ExpectationMatcher, 放入缓存
         List<ExpectationRulePO> ruleList = expectationRuleDao.getByKey(key);

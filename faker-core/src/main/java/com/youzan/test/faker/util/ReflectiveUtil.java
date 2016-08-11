@@ -16,7 +16,6 @@ public class ReflectiveUtil {
         try {
             classObj = Class.forName(className);
         } catch (ClassNotFoundException e) {
-            log.error("ClassNotFoundException: {}", className);
             throw new FakerOperationException("ClassNotFoundException: " + className);
         }
 
@@ -26,7 +25,7 @@ public class ReflectiveUtil {
     public static Constructor<?> getDefaultContructor(Class classObj) {
         Constructor[] constructorList = classObj.getConstructors();
         if (constructorList.length != 1) {
-            throw new RuntimeException("Only constructor is expected");
+            throw new FakerOperationException("Only constructor is expected");
         }
 
         int parameterCount = constructorList[0].getParameterCount();
